@@ -10,6 +10,10 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
+    if (persons.includes(newName)) {
+      alert(`${newName} is already added to phonebook`)
+      return
+    }
     setPersons(persons.concat(newName))
     setNewName('')
   }
