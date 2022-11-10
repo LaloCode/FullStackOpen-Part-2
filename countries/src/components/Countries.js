@@ -1,6 +1,11 @@
 import Country from './Country';
 
-const Countries = ({ filter, countries }) => {
+const Countries = ({ filter, countries, setFilter }) => {
+  const showCountry = (event) => {
+    event.preventDefault();
+    setFilter(event.target.value);
+  };
+
   const filteredCountries = countries.filter((country) =>
     country.name.common.toLowerCase().includes(filter.toLowerCase())
   );
@@ -11,7 +16,12 @@ const Countries = ({ filter, countries }) => {
     return (
       <div>
         {filteredCountries.map((country) => (
-          <div key={country.name.common}>{country.name.common}</div>
+          <div key={country.name.common}>
+            {country.name.common}{' '}
+            <button value={country.name.common} onClick={showCountry}>
+              show
+            </button>
+          </div>
         ))}
       </div>
     );
