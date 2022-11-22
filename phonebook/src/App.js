@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+import phoneService from './services/phones';
+
 const Filter = ({ filter, handleFilterChange }) => (
   <div>
     filter shown with <input value={filter} onChange={handleFilterChange} />
@@ -71,13 +73,18 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault();
+    const person = { name: newName, number: newPhone };
+
     if (persons.some((e) => e.name === newName)) {
       alert(`${newName} is already added to phonebook`);
       return;
     }
-    setPersons(persons.concat({ name: newName, phone: newPhone }));
-    setNewName('');
-    setNewPhone('');
+
+    phoneService.create(person).then((returnedPerson) => {
+      setPersons(persons.concat(returnedPerson));
+      setNewName('');
+      setNewPhone('');
+    });
   };
 
   return (
