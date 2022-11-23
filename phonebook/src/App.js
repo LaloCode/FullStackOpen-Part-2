@@ -28,7 +28,7 @@ const PersonForm = ({
   </form>
 );
 
-const Persons = ({ persons, filter }) => {
+const Persons = ({ persons, setPersons, filter }) => {
   return persons
     .filter((person) =>
       filter === ''
@@ -36,15 +36,26 @@ const Persons = ({ persons, filter }) => {
         : person.name.toLowerCase().includes(filter.toLowerCase())
     )
     .map((person) => {
-      return <Person key={person.name} person={person} />;
+      return <Person key={person.name} person={person} persons={persons} setPersons={setPersons} />;
     });
 };
 
-const Person = ({ person }) => (
-  <div>
-    {person.name} {person.number}
-  </div>
-);
+const Person = ({ person, persons, setPersons }) => {
+  const handleDelete = () => {
+    if (window.confirm(`Delete ${person.name}?`)) {
+      phoneService.deletePerson(person.id).then(() => {
+        setPersons(persons.filter(e => e.id !== person.id))
+      })
+    }
+  };
+
+  return (
+    <div>
+      {person.name} {person.number}{' '}
+      <button onClick={handleDelete}>delete</button>
+    </div>
+  );
+};
 
 const App = () => {
   const [persons, setPersons] = useState([]);
@@ -99,7 +110,7 @@ const App = () => {
         handlePhoneChange={handlePhoneChange}
       />
       <h3>Numbers</h3>
-      <Persons persons={persons} filter={filter} />
+      <Persons persons={persons} setPersons={setPersons} filter={filter} />
     </div>
   );
 };
