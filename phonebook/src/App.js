@@ -36,7 +36,14 @@ const Persons = ({ persons, setPersons, filter }) => {
         : person.name.toLowerCase().includes(filter.toLowerCase())
     )
     .map((person) => {
-      return <Person key={person.name} person={person} persons={persons} setPersons={setPersons} />;
+      return (
+        <Person
+          key={person.name}
+          person={person}
+          persons={persons}
+          setPersons={setPersons}
+        />
+      );
     });
 };
 
@@ -44,8 +51,8 @@ const Person = ({ person, persons, setPersons }) => {
   const handleDelete = () => {
     if (window.confirm(`Delete ${person.name}?`)) {
       phoneService.deletePerson(person.id).then(() => {
-        setPersons(persons.filter(e => e.id !== person.id))
-      })
+        setPersons(persons.filter((e) => e.id !== person.id));
+      });
     }
   };
 
@@ -86,7 +93,20 @@ const App = () => {
     const person = { name: newName, number: newPhone };
 
     if (persons.some((e) => e.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const id = persons.find((person) => person.name === newName).id;
+        phoneService.update(id, person).then((returnedPerson) => {
+          setPersons(
+            persons.map((person) =>
+              person.id !== id ? person : returnedPerson
+            )
+          );
+        });
+      }
       return;
     }
 
