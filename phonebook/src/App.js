@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
 
 import phoneService from './services/phones';
 
@@ -54,8 +53,8 @@ const App = () => {
   const [filter, setNewFilter] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then((response) => {
-      setPersons(response.data);
+    phoneService.getAll().then((persons) => {
+      setPersons(persons);
     });
   }, []);
 
