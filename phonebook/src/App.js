@@ -115,6 +115,8 @@ const App = () => {
             )
           );
         });
+        setNewName('');
+        setNewPhone('');
         setMessage(`${person.name} number was changed.`);
         setTimeout(() => {
           setMessage(null);
