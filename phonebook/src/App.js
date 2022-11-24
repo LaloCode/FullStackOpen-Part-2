@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 import phoneService from './services/phones';
 
@@ -64,9 +64,13 @@ const Person = ({ person, persons, setPersons }) => {
   );
 };
 
-const Notification = ({ message }) => {
+const Notification = ({ message, isError }) => {
   if (message === null) {
     return null;
+  }
+
+  if (isError !== false) {
+    return <div className="error"> {message} </div>;
   }
 
   return <div className="notification"> {message} </div>;
@@ -78,6 +82,7 @@ const App = () => {
   const [newPhone, setNewPhone] = useState('');
   const [filter, setNewFilter] = useState('');
   const [message, setMessage] = useState(null);
+  const isError = useRef(false);
 
   useEffect(() => {
     phoneService.getAll().then((persons) => {
@@ -108,13 +113,26 @@ const App = () => {
         )
       ) {
         const id = persons.find((person) => person.name === newName).id;
-        phoneService.update(id, person).then((returnedPerson) => {
-          setPersons(
-            persons.map((person) =>
-              person.id !== id ? person : returnedPerson
-            )
-          );
-        });
+        phoneService
+          .update(id, person)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== id ? person : returnedPerson
+              )
+            );
+          })
+          .catch((error) => {
+            isError.current = true;
+            setMessage(
+              `Information of ${person.name} has already been removed from server.`
+            );
+            setTimeout(() => {
+              setMessage(null);
+              isError.current = false;
+            }, 5000);
+            setPersons(persons.filter((n) => n.id !== id));
+          });
         setNewName('');
         setNewPhone('');
         setMessage(`${person.name} number was changed.`);
@@ -139,7 +157,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message} isError={isError.current} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
       <h3>Add a new</h3>
       <PersonForm
